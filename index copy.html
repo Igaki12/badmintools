@@ -692,6 +692,8 @@
     const thresholdValue = document.getElementById('thresholdValue');
     const updateThresholdButton = document.getElementById('updateThresholdButton');
     
+  
+    
     // *** ADDED *** DOM Elements for Export Functions
     const exportJSONButton = document.getElementById('exportJSONButton');
     const exportCSVButton = document.getElementById('exportCSVButton');
@@ -739,7 +741,12 @@
     const COURT_WIDTH = 610;
     const COURT_LENGTH = 1340;
     // *** ADDED *** Threshold for shot detection (pixels/second). Needs tuning.
-    let SHOT_VELOCITY_THRESHOLD = 5000; // Made this variable to allow dynamic updates 
+    // let SHOT_VELOCITY_THRESHOLD = parseInt(localStorage.getItem('shotVelocityThreshold')) || 5000; // Made this variable to allow dynamic updates 
+    let SHOT_VELOCITY_THRESHOLD = JSON.parse(localStorage.getItem('shotVelocityThreshold')) || 5000; // Made this variable to allow dynamic updates
+
+      // Initialize threshold slider and value from localStorage
+    thresholdSlider.value = SHOT_VELOCITY_THRESHOLD;
+    thresholdValue.textContent = SHOT_VELOCITY_THRESHOLD;
 
     async function initPoseLandmarker() {
         try {
@@ -1004,6 +1011,8 @@
         thresholdValue.textContent = thresholdSlider.value;
         // inputでSHOT_VELOCITY_THRESHOLDを更新
         SHOT_VELOCITY_THRESHOLD = parseInt(thresholdSlider.value);
+        // localStorageに保存
+        localStorage.setItem('shotVelocityThreshold', SHOT_VELOCITY_THRESHOLD.toString());
         // Re-run shot detection with new threshold
         if (wristPositions.length > 0 || correctedWristPositions.length > 0) {
             const wristData = isCorrectionApplied ? correctedWristPositions : wristPositions;
@@ -1193,6 +1202,8 @@
          isCorrectionApplied = false; homographyMatrix = null; correctedAnklePositions = []; correctedWristPositions = []; stopCroppingMode(); startCropButton.textContent = "コートに合わせてトリミング"; if (!visualizationControls.classList.contains('hidden')) { drawAnalysis(parseFloat(timeSlider.value)); } loadingTxt.textContent = "座標の補正をリセットしました。"; 
          // localStorageから補正後の座標を削除
          localStorage.removeItem('cropPoints');
+         // cropPointsを初期化
+         const w = cropOverlayCanvas.width, h = cropOverlayCanvas.height, mX = w * 0.15, mY = h * 0.15; cropPoints = [{ x: mX, y: mY }, { x: w - mX, y: mY }, { x: w - mX, y: h - mY }, { x: mX, y: h - mY }];
         });
     
     // *** MODIFIED *** A generic function to apply homography based on key prefix

@@ -755,8 +755,12 @@
             );
             poseLandmarker = await PoseLandmarker.createFromOptions(vision, {
                 baseOptions: {
-                    modelAssetPath: "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task",
-                    delegate: "GPU"
+                    // modelAssetPath: "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task",
+                    // delegate: "GPU"
+                    // api/pose_landmarker_full.task からローカルでダウンロードしたモデルを使用
+                    modelAssetPath: "api/pose_landmarker_full.task",
+                    // GPUを指定しない
+                    delegate: "CPU",
                 },
                 runningMode: runningMode,
                 numPoses: 1
