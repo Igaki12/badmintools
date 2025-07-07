@@ -1285,7 +1285,7 @@
     }
 
     function applyHomography(point, H) { const d = H[6] * point.x + H[7] * point.y + 1; return { x: (H[0] * point.x + H[1] * point.y + H[2]) / d, y: (H[3] * point.x + H[4] * point.y + H[5]) / d }; }
-    function getHomographyMatrix(src, dst) { const A = []; for (let i = 0; i < 4; i++) { const { x: sx, y: sy } = src[i]; const { x: dx, y: dy } = dst[i]; A.push([sx, sy, 1, 0, 0, 0, -dx * sx, -dx * sy, -dx]); A.push([0, 0, 0, sx, sy, 1, -dy * sx, -dy * sy, -dy]); } const b = []; for (let i = 0; i < 4; i++) { b.push(dst[i].x); b.push(dst[i].y); } const A_inv = []; for(let i=0; i<8; i++) { A_inv.push([]); for(let j=0; j<8; j++) { const {x:sx, y:sy} = src[Math.floor(i/2)]; if (i % 2 === 0) { A_inv[i][0] = sx; A_inv[i][1] = sy; A_inv[i][2] = 1; A_inv[i][3] = 0; A_inv[i][4] = 0; A_inv[i][5] = 0; A_inv[i][6] = -dst[Math.floor(i/2)].x * sx; A_inv[i][7] = -dst[Math.floor(i/2)].x * sy; } else { A_inv[i][0] = 0; A_inv[i][1] = 0; A_inv[i][2] = 0; A_inv[i][3] = sx; A_inv[i][4] = sy; A_inv[i][5] = 1; A_inv[i][6] = -dy * sx; A_inv[i][7] = -dy * sy; } } } const h = gaussianElimination(A_inv, b); if (!h) throw new Error("Matrix is singular."); return [...h, 1]; }
+    function getHomographyMatrix(src, dst) { const A = []; for (let i = 0; i < 4; i++) { const { x: sx, y: sy } = src[i]; const { x: dx, y: dy } = dst[i]; A.push([sx, sy, 1, 0, 0, 0, -dx * sx, -dx * sy, -dx]); A.push([0, 0, 0, sx, sy, 1, -dy * sx, -dy * sy, -dy]); } const b = []; for (let i = 0; i < 4; i++) { b.push(dst[i].x); b.push(dst[i].y); } const A_inv = []; for(let i=0; i<8; i++) { A_inv.push([]); for(let j=0; j<8; j++) { const {x:sx, y:sy} = src[Math.floor(i/2)]; const {x:dx, y:dy_val} = dst[Math.floor(i/2)]; if (i % 2 === 0) { A_inv[i][0] = sx; A_inv[i][1] = sy; A_inv[i][2] = 1; A_inv[i][3] = 0; A_inv[i][4] = 0; A_inv[i][5] = 0; A_inv[i][6] = -dx * sx; A_inv[i][7] = -dx * sy; } else { A_inv[i][0] = 0; A_inv[i][1] = 0; A_inv[i][2] = 0; A_inv[i][3] = sx; A_inv[i][4] = sy; A_inv[i][5] = 1; A_inv[i][6] = -dy_val * sx; A_inv[i][7] = -dy_val * sy; } } } const h = gaussianElimination(A_inv, b); if (!h) throw new Error("Matrix is singular."); return [...h, 1]; }
     function gaussianElimination(A, b) { const n = A.length; for (let i = 0; i < n; i++) { let maxRow = i; for (let k = i + 1; k < n; k++) { if (Math.abs(A[k][i]) > Math.abs(A[maxRow][i])) { maxRow = k; } } [A[i], A[maxRow]] = [A[maxRow], A[i]]; [b[i], b[maxRow]] = [b[maxRow], b[i]]; if (Math.abs(A[i][i]) < 1e-10) return null; for (let k = i + 1; k < n; k++) { A[i][k] /= A[i][i]; } b[i] /= A[i][i]; A[i][i] = 1; for (let k = 0; k < n; k++) { if (k !== i) { const factor = A[k][i]; for (let j = i; j < n; j++) { A[k][j] -= factor * A[i][j]; } b[k] -= factor * b[i]; } } } return b; }
 
     // --- *** ADDED *** Shot Analysis Functions ---
@@ -1383,6 +1383,7 @@
             shotButtonsContainer.appendChild(title);
         }
         shots.forEach((time, index) => {
+            // Create a button for each shot time
             const button = document.createElement('button');
             button.className = 'glass-button text-sm';
             button.textContent = `${(time).toFixed(1)}s`;
