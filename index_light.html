@@ -212,6 +212,44 @@
             </div>
         </div>
     </section>
+
+    <!-- Section 4: Data Export -->
+    <section class="mb-8 p-4 glass-card section-hover animate-fade-in">
+        <div class="flex justify-between items-center">
+            <h3 class="text-xl font-bold text-gray-700 dark:text-gray-200">データエクスポート</h3>
+            <button id="exportToggleButton" class="md:hidden text-sm text-blue-600 dark:text-blue-400 flex items-center">
+                <span id="exportToggleText">表示</span>
+                <svg id="exportToggleIcon" class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </button>
+        </div>
+        <div id="exportButtonsContainer" class="hidden md:block mt-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                <button id="exportJSONButton" class="btn btn-secondary">JSON形式</button>
+                <button id="exportCSVButton" class="btn btn-secondary">CSV形式</button>
+                <button id="exportImageButton" class="btn btn-secondary">画像保存</button>
+                <button id="generateReportButton" class="btn btn-secondary">レポート生成</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 5: Help -->
+    <section class="mb-6 p-4 simple-card">
+        <h2 class="text-xl font-semibold mb-3 text-accent">ヘルプ・使い方</h2>
+        <ol class="list-decimal list-inside text-left">
+            <li class="text-secondary mb-2">
+                <span class="font-medium text-gray-800">動画のアップロード:</span> 録画ボタンをクリックして、バドミントンの動画をアップロードします。
+            </li>
+            <li class="text-secondary mb-2">
+                <span class="font-medium text-gray-800">録画と座標取得:</span> 録画開始ボタンをクリックして、選手の動きを録画します。録画停止後、自動で分析が行われます。
+            </li>
+            <li class="text-secondary mb-2">
+                <span class="font-medium text-gray-800">移動・ショット分析:</span> 録画した動画から、選手の移動軌跡やショットを分析します。
+            </li>
+            <li class="text-secondary mb-2">
+                <span class="font-medium text-gray-800">データエクスポート:</span> 分析結果をJSON, CSV, 画像, レポート形式でエクスポートできます。
+            </li>
+        </ol>
+    </section>
 </div>
 
 <script type="module">
@@ -263,6 +301,10 @@
     const exportCSVButton = document.getElementById('exportCSVButton');
     const exportImageButton = document.getElementById('exportImageButton');
     const generateReportButton = document.getElementById('generateReportButton');
+    const exportToggleButton = document.getElementById('exportToggleButton');
+    const exportToggleText = document.getElementById('exportToggleText');
+    const exportToggleIcon = document.getElementById('exportToggleIcon');
+    const exportButtonsContainer = document.getElementById('exportButtonsContainer');
 
     // Canvas Contexts
     let ctxPose = poseCanvas.getContext('2d');
@@ -538,6 +580,23 @@
 
         drawAnalysis(parseFloat(timeSlider.value));
         loadingTxt.textContent = "移動分析とショット分析の結果を表示しています。";
+        // スライダーの最大値を設定
+        videoDuration = video.duration;
+        sliderMaxTime.textContent = videoDuration.toFixed(1) + 's';
+        timeSlider.max = videoDuration;
+        timeSlider.value = 0;
+        drawAnalysis(0);
+        visualizationControls.classList.remove('hidden');
+        correctionControls.classList.remove('hidden');
+        wristAnalysisContainer.classList.remove('hidden'); // *** ADDED ***
+    });
+
+    // Data export toggle for mobile
+    exportToggleButton.addEventListener('click', () => {
+        const isHidden = exportButtonsContainer.classList.contains('hidden');
+        exportButtonsContainer.classList.toggle('hidden');
+        exportToggleText.textContent = isHidden ? '非表示' : '表示';
+        exportToggleIcon.innerHTML = isHidden ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>' : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>';
     });
 
     // Threshold control event listeners
@@ -765,7 +824,7 @@
     }
 
     function applyHomography(point, H) { const d = H[6] * point.x + H[7] * point.y + 1; return { x: (H[0] * point.x + H[1] * point.y + H[2]) / d, y: (H[3] * point.x + H[4] * point.y + H[5]) / d }; }
-    function getHomographyMatrix(src, dst) { const A = []; for (let i = 0; i < 4; i++) { const { x: sx, y: sy } = src[i]; const { x: dx, y: dy } = dst[i]; A.push([sx, sy, 1, 0, 0, 0, -dx * sx, -dx * sy, -dx]); A.push([0, 0, 0, sx, sy, 1, -dy * sx, -dy * sy, -dy]); } const b = []; for (let i = 0; i < 4; i++) { b.push(dst[i].x); b.push(dst[i].y); } const A_inv = []; for(let i=0; i<8; i++) { A_inv.push([]); for(let j=0; j<8; j++) { const {x:sx, y:sy} = src[Math.floor(i/2)]; if (i % 2 === 0) { A_inv[i][0] = sx; A_inv[i][1] = sy; A_inv[i][2] = 1; A_inv[i][3] = 0; A_inv[i][4] = 0; A_inv[i][5] = 0; A_inv[i][6] = -dst[Math.floor(i/2)].x * sx; A_inv[i][7] = -dst[Math.floor(i/2)].x * sy; } else { A_inv[i][0] = 0; A_inv[i][1] = 0; A_inv[i][2] = 0; A_inv[i][3] = sx; A_inv[i][4] = sy; A_inv[i][5] = 1; A_inv[i][6] = -dst[Math.floor(i/2)].y * sx; A_inv[i][7] = -dst[Math.floor(i/2)].y * sy; } } } const h = gaussianElimination(A_inv, b); if (!h) throw new Error("Matrix is singular."); return [...h, 1]; }
+    function getHomographyMatrix(src, dst) { const A = []; for (let i = 0; i < 4; i++) { const { x: sx, y: sy } = src[i]; const { x: dx, y: dy } = dst[i]; A.push([sx, sy, 1, 0, 0, 0, -dx * sx, -dx * sy, -dx]); A.push([0, 0, 0, sx, sy, 1, -dy * sx, -dy * sy, -dy]); } const b = []; for (let i = 0; i < 4; i++) { b.push(dst[i].x); b.push(dst[i].y); } const A_inv = []; for(let i=0; i<8; i++) { A_inv.push([]); for(let j=0; j<8; j++) { const {x:sx, y:sy} = src[Math.floor(i/2)]; if (i % 2 === 0) { A_inv[i][0] = sx; A_inv[i][1] = sy; A_inv[i][2] = 1; A_inv[i][3] = 0; A_inv[i][4] = 0; A_inv[i][5] = 0; A_inv[i][6] = -dst[Math.floor(i/2)].x * sx; A_inv[i][7] = -dst[Math.floor(i/2)].x * sy; } else { A_inv[i][0] = 0; A_inv[i][1] = 0; A_inv[i][2] = 0; A_inv[i][3] = sx; A_inv[i][4] = sy; A_inv[i][5] = 1; A_inv[i][6] = -dy * sx; A_inv[i][7] = -dy * sy; } } } const h = gaussianElimination(A_inv, b); if (!h) throw new Error("Matrix is singular."); return [...h, 1]; }
     function gaussianElimination(A, b) { const n = A.length; for (let i = 0; i < n; i++) { let maxRow = i; for (let k = i + 1; k < n; k++) { if (Math.abs(A[k][i]) > Math.abs(A[maxRow][i])) { maxRow = k; } } [A[i], A[maxRow]] = [A[maxRow], A[i]]; [b[i], b[maxRow]] = [b[maxRow], b[i]]; if (Math.abs(A[i][i]) < 1e-10) return null; for (let k = i + 1; k < n; k++) { A[i][k] /= A[i][i]; } b[i] /= A[i][i]; A[i][i] = 1; for (let k = 0; k < n; k++) { if (k !== i) { const factor = A[k][i]; for (let j = i; j < n; j++) { A[k][j] -= factor * A[i][j]; } b[k] -= factor * b[i]; } } } return b; }
 
     // --- *** ADDED *** Shot Analysis Functions ---
@@ -1008,6 +1067,146 @@ ${shotTimes.map((time, i) => `  ショット${i + 1}: ${time.toFixed(2)}秒`).jo
     exportImageButton.addEventListener('click', exportImages);
     generateReportButton.addEventListener('click', generateReport);
 
+    // Touch event listeners for mobile cropping
+    cropOverlayCanvas.addEventListener('touchstart', handleTouchStart, { passive: false });
+    cropOverlayCanvas.addEventListener('touchmove', handleTouchMove, { passive: false });
+    cropOverlayCanvas.addEventListener('touchend', handleTouchEnd);
+    cropOverlayCanvas.addEventListener('touchcancel', handleTouchEnd);
+
+
+    function getMousePos(canvas, evt) {
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        return {
+            x: (evt.clientX - rect.left) * scaleX,
+            y: (evt.clientY - rect.top) * scaleY
+        };
+    }
+
+    // Utility function to get touch coordinates
+    function getTouchCoords(canvas, evt) {
+        const rect = canvas.getBoundingClientRect();
+        return {
+            x: evt.touches[0].clientX - rect.left,
+            y: evt.touches[0].clientY - rect.top
+        };
+    }
+
+    function handleMouseDown(e) {
+        e.preventDefault();
+        const mousePos = getMousePos(cropOverlayCanvas, e);
+        draggedPointIndex = cropPoints.findIndex(p => Math.sqrt(Math.pow(mousePos.x - p.x, 2) + Math.pow(mousePos.y - p.y, 2)) < CROP_HANDLE_RADIUS);
+        if (draggedPointIndex !== -1) {
+            isDragging = true;
+            cropOverlayCanvas.style.cursor = 'grabbing';
+        }
+    }
+
+    function handleMouseMove(e) {
+        e.preventDefault();
+        if (!isDragging) return;
+        const mousePos = getMousePos(cropOverlayCanvas, e);
+        cropPoints[draggedPointIndex] = mousePos;
+        drawCropOverlay();
+    }
+
+    function handleMouseUp(e) {
+        e.preventDefault();
+        isDragging = false;
+        draggedPointIndex = -1;
+    }
+
+    function handleMouseOut(e) {
+        e.preventDefault();
+        isDragging = false;
+        draggedPointIndex = -1;
+    }
+
+    // Touch event handlers
+    function handleTouchStart(e) {
+        e.preventDefault();
+        const touchPos = getTouchCoords(cropOverlayCanvas, e);
+        for (let i = 0; i < cropPoints.length; i++) {
+            const dist = Math.sqrt(Math.pow(touchPos.x - cropPoints[i].x, 2) + Math.pow(touchPos.y - cropPoints[i].y, 2));
+            if (dist < CROP_HANDLE_RADIUS) {
+                isDragging = true;
+                draggedPointIndex = i;
+                break;
+            }
+        }
+    }
+
+    function handleTouchMove(e) {
+        e.preventDefault();
+        if (!isDragging) return;
+        const touchPos = getTouchCoords(cropOverlayCanvas, e);
+        cropPoints[draggedPointIndex] = touchPos;
+        drawCropOverlay();
+    }
+
+    function handleTouchEnd(e) {
+        e.preventDefault();
+        isDragging = false;
+        draggedPointIndex = -1;
+    }
+
+    function getHomographyMatrix(p1, p2, p3, p4, q1, q2, q3, q4) {
+        // ...
+        // 参照: https://stackoverflow.com/questions/27249148/how-to-get-homography-matrix-from-4-points-in-javascript
+        // 参照: http://www.corrmap.com/features/homography_transformation.php
+        const dx1 = p2.x - p3.x;
+        const dx2 = p4.x - p3.x;
+        const dx3 = p1.x - p2.x + p3.x - p4.x;
+        const dy1 = p2.y - p3.y;
+        const dy2 = p4.y - p3.y;
+        const dy3 = p1.y - p2.y + p3.y - p4.y;
+
+        const dq1 = q2.x - q3.x;
+        const dq2 = q4.x - q3.x;
+        const dq3 = q1.x - q2.x + q3.x - q4.x;
+        const dr1 = q2.y - q3.y;
+        const dr2 = q4.y - q3.y;
+        const dr3 = q1.y - q2.y + q3.y - q4.y;
+
+        const det = dx1 * dy2 - dx2 * dy1;
+        const a = (dq1 * dy2 - dq2 * dy1) / det;
+        const b = (dq2 * dx1 - dq1 * dx2) / det;
+        const c = q3.x - p3.x * a - p3.y * b;
+
+        const d = (dr1 * dy2 - dr2 * dy1) / det;
+        const e_val = (dr2 * dx1 - dr1 * dx2) / det; // 'e' is a reserved keyword in strict mode
+        const f = q3.y - p3.x * d - p3.y * e_val;
+
+        const det_g = dx1 * dy3 - dx3 * dy2;
+        const g_val = (dq3 * dy2 - dq1 * dy3) / det_g; // 'g' is a reserved keyword
+        const h_val = (dq1 * dx3 - dq3 * dx1) / det_g; // 'h' is a reserved keyword
+
+        const det_h = dy1 * dx3 - dy3 * dx1;
+        const g_val_alt = (dr3 * dx1 - dr1 * dx3) / det_h;
+        const h_val_alt = (dr1 * dy3 - dr3 * dy1) / det_h;
+        
+        // To avoid issues with variable names like 'e', 'g', 'h'
+        const dy_val = dy3; // Corrected: dy was not defined, should be dy3 or a new var
+        
+        const g = ( (dq3*dy2 - dq2*dy_val) / (dx1*dy2 - dx2*dy1) - a ) / ( (dx3*dy2 - dx2*dy_val) / (dx1*dy2 - dx2*dy1) );
+        const h = ( (dq3*dx1 - dq1*dx3) / (dx1*dy2 - dx2*dy1) - b ) / ( (dx3*dx1 - dx1*dx3) / (dx1*dy2 - dx2*dy1) );
+
+
+        return [
+            [a + g * q1.x, b + h * q1.x, c],
+            [d + g * q1.y, e_val + h * q1.y, f],
+            [g, h, 1]
+        ];
+    }
+
+    function applyHomography(point, matrix) {
+        const d = matrix[6] * point.x + matrix[7] * point.y + 1;
+        return {
+            x: (matrix[0] * point.x + matrix[1] * point.y + matrix[2]) / d,
+            y: (matrix[3] * point.x + matrix[4] * point.y + matrix[5]) / d
+        };
+    }
 </script>
 
 </body>

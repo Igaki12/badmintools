@@ -655,6 +655,89 @@
             </div>
         </div>
     </section>
+
+    <!-- Section 4: Data Export -->
+    <section class="mb-8 p-4 glass-card section-hover animate-fade-in">
+        <div class="flex justify-between items-center">
+            <h3 class="text-xl font-bold text-gray-700 dark:text-gray-200">データエクスポート</h3>
+            <button id="exportToggleButton" class="md:hidden text-sm text-blue-600 dark:text-blue-400 flex items-center">
+                <span id="exportToggleText">表示</span>
+                <svg id="exportToggleIcon" class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </button>
+        </div>
+        <div id="exportButtonsContainer" class="hidden md:block mt-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                <button id="exportJSONButton" class="btn btn-secondary">JSON形式</button>
+                <button id="exportCSVButton" class="btn btn-secondary">CSV形式</button>
+                <button id="exportImageButton" class="btn btn-secondary">画像保存</button>
+                <button id="generateReportButton" class="btn btn-secondary">レポート生成</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 5: Help -->
+    <section class="mb-8 p-4 glass-card section-hover animate-fade-in">
+        <div class="flex justify-between items-center">
+            <h3 class="text-xl font-bold text-gray-700 dark:text-gray-200">使い方ガイド</h3>
+            <button id="closeHelpModal" class="text-gray-700 hover:text-gray-900 transition-colors">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        
+        <div class="space-y-6">
+            <div>
+                <h4 class="text-lg font-semibold text-gray-900 mb-2">基本的な使い方</h4>
+                <ol class="list-decimal list-inside space-y-2 text-gray-700 text-sm">
+                    <li>動画ファイルを選択してアップロード</li>
+                    <li>「録画開始」ボタンで姿勢推定を開始</li>
+                    <li>動画終了後、「分析を開始」で軌跡とヒートマップを表示</li>
+                    <li>必要に応じてデータをエクスポート</li>
+                </ol>
+            </div>
+            
+            <div>
+                <h4 class="text-lg font-semibold text-gray-900 mb-2">キーボードショートカット</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-gray-700">
+                    <div><kbd class="bg-gray-100 border border-gray-300 text-xs px-2 py-1 rounded">Space</kbd> 録画開始/停止</div>
+                    <div><kbd class="bg-gray-100 border border-gray-300 text-xs px-2 py-1 rounded">A</kbd> 分析開始</div>
+                    <div><kbd class="bg-gray-100 border border-gray-300 text-xs px-2 py-1 rounded">H</kbd> ヘルプを表示</div>
+                    <div><kbd class="bg-gray-100 border border-gray-300 text-xs px-2 py-1 rounded">T</kbd> テーマ切り替え</div>
+                    <div><kbd class="bg-gray-100 border border-gray-300 text-xs px-2 py-1 rounded">E</kbd> JSONエクスポート</div>
+                    <div><kbd class="bg-gray-100 border border-gray-300 text-xs px-2 py-1 rounded">R</kbd> レポート生成</div>
+                </div>
+            </div>
+            
+            <div>
+                <h4 class="text-lg font-semibold text-gray-900 mb-2">機能説明</h4>
+                <div class="space-y-3 text-sm text-gray-700">
+                    <div>
+                        <strong class="text-gray-900">姿勢推定:</strong> MediapipeのPoseLandmarkerを使用して、リアルタイムで身体のキーポイントを検出
+                    </div>
+                    <div>
+                        <strong class="text-gray-900">ショット検出:</strong> 手首の速度から自動的にショットタイミングを判定
+                    </div>
+                    <div>
+                        <strong class="text-gray-900">コート補正:</strong> 動画内のコートの歪みを補正して正確な軌跡を表示
+                    </div>
+                    <div>
+                        <strong class="text-gray-900">比較モード:</strong> 2つの動画を同時に分析して比較が可能
+                    </div>
+                </div>
+            </div>
+            
+            <div>
+                <h4 class="text-lg font-semibold text-gray-900 mb-2">注意事項</h4>
+                <ul class="list-disc list-inside space-y-2 text-gray-700 text-sm">
+                    <li>初回のAIモデル読み込みには時間がかかります</li>
+                    <li>動画の解像度や品質によって検出精度が変わります</li>
+                    <li>明るく、選手が明確に見える動画が推奨されます</li>
+                    <li>エクスポート機能はブラウザのダウンロード設定に依存します</li>
+                </ul>
+            </div>
+        </div>
+    </section>
 </div>
 
 <script type="module">
@@ -706,6 +789,10 @@
     const exportCSVButton = document.getElementById('exportCSVButton');
     const exportImageButton = document.getElementById('exportImageButton');
     const generateReportButton = document.getElementById('generateReportButton');
+    const exportToggleButton = document.getElementById('exportToggleButton');
+    const exportToggleText = document.getElementById('exportToggleText');
+    const exportToggleIcon = document.getElementById('exportToggleIcon');
+    const exportButtonsContainer = document.getElementById('exportButtonsContainer');
 
     // Canvas Contexts
     let ctxPose = poseCanvas.getContext('2d');
@@ -973,50 +1060,39 @@
         visualizationControls.classList.remove('hidden');
         wristAnalysisContainer.classList.remove('hidden'); // *** ADDED *** Show wrist graph container
 
-        // *** ADDED *** Perform shot detection
-        const wristData = isCorrectionApplied ? correctedWristPositions : wristPositions;
-        const velocities = calculateWristVelocities(wristData, isCorrectionApplied);
-        shotTimes = detectShots(velocities, SHOT_VELOCITY_THRESHOLD);
-        createShotButtons(shotTimes);
-
-        drawAnalysis(parseFloat(timeSlider.value));
-        loadingTxt.textContent = "移動分析とショット分析の結果を表示しています。";
-    });
-
-    // テーマ切り替え機能
-    document.querySelectorAll('.theme-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            const theme = btn.dataset.theme;
-            if (theme === 'light') {
-                document.documentElement.removeAttribute('data-theme');
-            } else {
-                document.documentElement.setAttribute('data-theme', theme);
-            }
-            // テーマ設定を保存
-            localStorage.setItem('badminton-theme', theme);
-        });
-    });
-
-    // ページ読み込み時にテーマを復元
-    document.addEventListener('DOMContentLoaded', () => {
-        const savedTheme = localStorage.getItem('badminton-theme') || 'light';
-        if (savedTheme !== 'light') {
-            document.documentElement.setAttribute('data-theme', savedTheme);
+        // 座標補正が適用されている場合、軌跡とヒートマップを再描画
+        if (isCorrectionApplied) {
+            correctedAnklePositions = applyHomographyToAll(anklePositions, homographyMatrix);
+            correctedWristPositions = applyHomographyToAll(wristPositions, homographyMatrix);
         }
-        document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
-        document.querySelector(`[data-theme="${savedTheme}"]`).classList.add('active');
-        
-        // アニメーション追加
-        setTimeout(() => {
-            document.querySelectorAll('section:not(.hidden)').forEach((section, index) => {
-                section.style.animationDelay = `${index * 0.2}s`;
-            });
-        }, 100);
+        // ショット検出
+        shotTimes = detectShots(isCorrectionApplied ? correctedWristPositions : wristPositions, video.duration);
+        // ショットボタンを生成
+        generateShotButtons(shotTimes);
+        // 手首の速度グラフを描画
+        drawWristVelocityChart(isCorrectionApplied ? correctedWristPositions : wristPositions);
+
+        loadingTxt.textContent = "移動分析とショット分析の結果を表示しています。";
+        // スライダーの最大値を設定
+        videoDuration = video.duration;
+        sliderMaxTime.textContent = videoDuration.toFixed(1) + 's';
+        timeSlider.max = videoDuration;
+        timeSlider.value = 0;
+        drawAnalysis(0);
+        visualizationControls.classList.remove('hidden');
+        correctionControls.classList.remove('hidden');
+        wristAnalysisContainer.classList.remove('hidden'); // *** ADDED ***
     });
-    
-    // *** ADDED *** Threshold control event listeners
+
+    // Data export toggle for mobile
+    exportToggleButton.addEventListener('click', () => {
+        const isHidden = exportButtonsContainer.classList.contains('hidden');
+        exportButtonsContainer.classList.toggle('hidden');
+        exportToggleText.textContent = isHidden ? '非表示' : '表示';
+        exportToggleIcon.innerHTML = isHidden ? '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>' : '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>';
+    });
+
+    // Threshold control event listeners
     thresholdSlider.addEventListener('input', () => {
         thresholdValue.textContent = thresholdSlider.value;
         // inputでSHOT_VELOCITY_THRESHOLDを更新
@@ -1181,72 +1257,217 @@
     const stopDrag = () => { if (isDragging) { isDragging = false; draggedPointIndex = -1; cropOverlayCanvas.style.cursor = 'grab'; } };
     cropOverlayCanvas.addEventListener('mouseup', stopDrag);
     cropOverlayCanvas.addEventListener('mouseout', stopDrag);
-    applyCorrectionButton.addEventListener('click', () => {
-        const srcPoints = cropPoints;
-        const dstPoints = [{ x: 0, y: 0 }, { x: trajectoryCanvas.width, y: 0 }, { x: trajectoryCanvas.width, y: trajectoryCanvas.height }, { x: 0, y: trajectoryCanvas.height },];
-        try {
-            homographyMatrix = getHomographyMatrix(srcPoints, dstPoints);
-            // *** MODIFIED *** Apply homography to both ankles and wrists → 手首には補正を適用しない様に修正
-            correctedAnklePositions = applyHomographyToAllPoints(anklePositions, homographyMatrix, poseCanvas.width, poseCanvas.height, 'Ankle');
-            // Websorageに補正後の座標を保存
-            localStorage.setItem('cropPoints', JSON.stringify(cropPoints));
+
+    // Add touch event listeners for mobile cropping
+    cropOverlayCanvas.addEventListener('touchstart', handleTouchStart, { passive: false });
+    cropOverlayCanvas.addEventListener('touchmove', handleTouchMove, { passive: false });
+    cropOverlayCanvas.addEventListener('touchend', handleTouchEnd);
+    cropOverlayCanvas.addEventListener('touchcancel', handleTouchEnd);
 
 
-
-            // *** MODIFIED *** Apply homography to wrists but keep original positions
-            // 手首には補正を適用しない予定
-            correctedWristPositions = applyHomographyToAllPoints(wristPositions, homographyMatrix, poseCanvas.width, poseCanvas.height, 'Wrist');
-            // Update the trajectory and heatmap canvases
-
-
-
-
-            isCorrectionApplied = true;
-            stopCroppingMode();
-            startCropButton.textContent = "コートに合わせてトリミング";
-            if (!visualizationControls.classList.contains('hidden')) { drawAnalysis(parseFloat(timeSlider.value)); } else { analyzeButton.click(); }
-            loadingTxt.textContent = "座標の補正が適用されました。";
-        } catch (error) { console.error("Failed to compute homography:", error); loadingTxt.textContent = "エラー: 座標の補正に失敗しました。四隅が交差しないように指定してください。"; }
-    });
-    resetCorrectionButton.addEventListener('click', () => {
-         isCorrectionApplied = false; homographyMatrix = null; correctedAnklePositions = []; correctedWristPositions = []; stopCroppingMode(); startCropButton.textContent = "コートに合わせてトリミング"; if (!visualizationControls.classList.contains('hidden')) { drawAnalysis(parseFloat(timeSlider.value)); } loadingTxt.textContent = "座標の補正をリセットしました。"; 
-         // localStorageから補正後の座標を削除
-         localStorage.removeItem('cropPoints');
-         // cropPointsを初期化
-         const w = cropOverlayCanvas.width, h = cropOverlayCanvas.height, mX = w * 0.15, mY = h * 0.15; cropPoints = [{ x: mX, y: mY }, { x: w - mX, y: mY }, { x: w - mX, y: h - mY }, { x: mX, y: h - mY }];
-        });
-    
-    // *** MODIFIED *** A generic function to apply homography based on key prefix
-    function applyHomographyToAllPoints(points, H, videoW, videoH, keyPrefix) {
-        const leftKey = `left${keyPrefix}`;
-        const rightKey = `right${keyPrefix}`;
-        return points.map(p => {
-            const newP = { time: p.time };
-            if (p[leftKey] && keyPrefix !== 'Wrist') { // wristの場合は補正を適用しないように修正
-                // ただし、座標変換は行う
-                const absCoords = { x: p[leftKey].x * videoW, y: p[leftKey].y * videoH };
-                newP[leftKey] = applyHomography(absCoords, H);
-            }
-            else if (p[leftKey]) {
-                // wristの場合は補正を適用しないように修正
-                newP[leftKey] = { x: p[leftKey].x * videoW, y: p[leftKey].y * videoH };
-            }
-            if (p[rightKey] && keyPrefix !== 'Wrist') { // wristの場合は補正を適用しないように修正
-                // ただし、座標変換は行う
-                const absCoords = { x: p[rightKey].x * videoW, y: p[rightKey].y * videoH };
-                newP[rightKey] = applyHomography(absCoords, H);
-            }
-            else if (p[rightKey]) {
-                // wristの場合は補正を適用しないように修正
-                newP[rightKey] = { x: p[rightKey].x * videoW, y: p[rightKey].y * videoH };
-            }
-            return newP;
-        });
+    function getMousePos(canvas, evt) {
+        const rect = canvas.getBoundingClientRect();
+        return {
+            x: evt.clientX - rect.left,
+            y: evt.clientY - rect.top
+        };
     }
 
-    function applyHomography(point, H) { const d = H[6] * point.x + H[7] * point.y + 1; return { x: (H[0] * point.x + H[1] * point.y + H[2]) / d, y: (H[3] * point.x + H[4] * point.y + H[5]) / d }; }
-    function getHomographyMatrix(src, dst) { const A = []; for (let i = 0; i < 4; i++) { const { x: sx, y: sy } = src[i]; const { x: dx, y: dy } = dst[i]; A.push([sx, sy, 1, 0, 0, 0, -dx * sx, -dx * sy, -dx]); A.push([0, 0, 0, sx, sy, 1, -dy * sx, -dy * sy, -dy]); } const b = []; for (let i = 0; i < 4; i++) { b.push(dst[i].x); b.push(dst[i].y); } const A_inv = []; for(let i=0; i<8; i++) { A_inv.push([]); for(let j=0; j<8; j++) { const {x:sx, y:sy} = src[Math.floor(i/2)]; if (i % 2 === 0) { A_inv[i][0] = sx; A_inv[i][1] = sy; A_inv[i][2] = 1; A_inv[i][3] = 0; A_inv[i][4] = 0; A_inv[i][5] = 0; A_inv[i][6] = -dst[Math.floor(i/2)].x * sx; A_inv[i][7] = -dst[Math.floor(i/2)].x * sy; } else { A_inv[i][0] = 0; A_inv[i][1] = 0; A_inv[i][2] = 0; A_inv[i][3] = sx; A_inv[i][4] = sy; A_inv[i][5] = 1; A_inv[i][6] = -dst[Math.floor(i/2)].y * sx; A_inv[i][7] = -dst[Math.floor(i/2)].y * sy; } } } const h = gaussianElimination(A_inv, b); if (!h) throw new Error("Matrix is singular."); return [...h, 1]; }
-    function gaussianElimination(A, b) { const n = A.length; for (let i = 0; i < n; i++) { let maxRow = i; for (let k = i + 1; k < n; k++) { if (Math.abs(A[k][i]) > Math.abs(A[maxRow][i])) { maxRow = k; } } [A[i], A[maxRow]] = [A[maxRow], A[i]]; [b[i], b[maxRow]] = [b[maxRow], b[i]]; if (Math.abs(A[i][i]) < 1e-10) return null; for (let k = i + 1; k < n; k++) { A[i][k] /= A[i][i]; } b[i] /= A[i][i]; A[i][i] = 1; for (let k = 0; k < n; k++) { if (k !== i) { const factor = A[k][i]; for (let j = i; j < n; j++) { A[k][j] -= factor * A[i][j]; } b[k] -= factor * b[i]; } } } return b; }
+    // Utility function to get touch coordinates
+    function getTouchCoords(canvas, evt) {
+        const rect = canvas.getBoundingClientRect();
+        return {
+            x: evt.touches[0].clientX - rect.left,
+            y: evt.touches[0].clientY - rect.top
+        };
+    }
+
+    function handleMouseDown(e) {
+        e.preventDefault();
+        const mousePos = getMousePos(cropOverlayCanvas, e);
+        draggedPointIndex = cropPoints.findIndex(p => Math.sqrt(Math.pow(mousePos.x - p.x, 2) + Math.pow(mousePos.y - p.y, 2)) < CROP_HANDLE_RADIUS);
+        if (draggedPointIndex !== -1) {
+            isDragging = true;
+            cropOverlayCanvas.style.cursor = 'grabbing';
+        }
+    }
+
+    function handleMouseMove(e) {
+        e.preventDefault();
+        if (!isDragging) return;
+        const mousePos = getMousePos(cropOverlayCanvas, e);
+        cropPoints[draggedPointIndex] = mousePos;
+        drawCropOverlay();
+    }
+
+    function handleMouseUp(e) {
+        e.preventDefault();
+        isDragging = false;
+        draggedPointIndex = -1;
+    }
+
+    function handleMouseOut(e) {
+        e.preventDefault();
+        isDragging = false;
+        draggedPointIndex = -1;
+    }
+
+    // Touch event handlers
+    function handleTouchStart(e) {
+        e.preventDefault();
+        const touchPos = getTouchCoords(cropOverlayCanvas, e);
+        for (let i = 0; i < cropPoints.length; i++) {
+            const dist = Math.sqrt(Math.pow(touchPos.x - cropPoints[i].x, 2) + Math.pow(touchPos.y - cropPoints[i].y, 2));
+            if (dist < CROP_HANDLE_RADIUS) {
+                isDragging = true;
+                draggedPointIndex = i;
+                break;
+            }
+        }
+    }
+
+    function handleTouchMove(e) {
+        e.preventDefault();
+        if (!isDragging) return;
+        const touchPos = getTouchCoords(cropOverlayCanvas, e);
+        cropPoints[draggedPointIndex] = touchPos;
+        drawCropOverlay();
+    }
+
+    function handleTouchEnd(e) {
+        e.preventDefault();
+        isDragging = false;
+        draggedPointIndex = -1;
+    }
+
+    function getHomographyMatrix(p1, p2, p3, p4, q1, q2, q3, q4) {
+        // ...
+        // 参照: https://stackoverflow.com/questions/27249148/how-to-get-homography-matrix-from-4-points-in-javascript
+        // 参照: http://www.corrmap.com/features/homography_transformation.php
+        const dx1 = p2.x - p3.x;
+        const dx2 = p4.x - p3.x;
+        const dx3 = p1.x - p2.x + p3.x - p4.x;
+        const dy1 = p2.y - p3.y;
+        const dy2 = p4.y - p3.y;
+        const dy3 = p1.y - p2.y + p3.y - p4.y;
+
+        const dq1 = q2.x - q3.x;
+        const dq2 = q4.x - q3.x;
+        const dq3 = q1.x - q2.x + q3.x - q4.x;
+        const dr1 = q2.y - q3.y;
+        const dr2 = q4.y - q3.y;
+        const dr3 = q1.y - q2.y + q3.y - q4.y;
+
+        const det = dx1 * dy2 - dx2 * dy1;
+        const a = (dq1 * dy2 - dq2 * dy1) / det;
+        const b = (dq2 * dx1 - dq1 * dx2) / det;
+        const c = q3.x - p3.x * a - p3.y * b;
+
+        const d = (dr1 * dy2 - dr2 * dy1) / det;
+        const e_val = (dr2 * dx1 - dr1 * dx2) / det; // 'e' is a reserved keyword in strict mode
+        const f = q3.y - p3.x * d - p3.y * e_val;
+
+        const det_g = dx1 * dy3 - dx3 * dy2;
+        const g_val = (dq3 * dy2 - dq1 * dy3) / det_g; // 'g' is a reserved keyword
+        const h_val = (dq1 * dx3 - dq3 * dx1) / det_g; // 'h' is a reserved keyword
+
+        const det_h = dy1 * dx3 - dy3 * dx1;
+        const g_val_alt = (dr3 * dx1 - dr1 * dx3) / det_h;
+        const h_val_alt = (dr1 * dy3 - dr3 * dy1) / det_h;
+        
+        // To avoid issues with variable names like 'e', 'g', 'h'
+        const dy_val = dy3; // Corrected: dy was not defined, should be dy3 or a new var
+        
+        const g = ( (dq3*dy2 - dq2*dy_val) / (dx1*dy2 - dx2*dy1) - a ) / ( (dx3*dy2 - dx2*dy_val) / (dx1*dy2 - dx2*dy1) );
+        const h = ( (dq3*dx1 - dq1*dx3) / (dx1*dy2 - dx2*dy1) - b ) / ( (dx3*dx1 - dx1*dx3) / (dx1*dy2 - dx2*dy1) );
+
+
+        return [
+            [a + g * q1.x, b + h * q1.x, c],
+            [d + g * q1.y, e_val + h * q1.y, f],
+            [g, h, 1]
+        ];
+    }
+
+    function applyHomography(point, matrix) {
+        const d = matrix[6] * point.x + matrix[7] * point.y + 1;
+        return { 
+            x: (matrix[0] * point.x + matrix[1] * point.y + matrix[2]) / d, 
+            y: (matrix[3] * point.x + matrix[4] * point.y + matrix[5]) / d 
+        };
+    }
+    function getHomographyMatrix(src, dst) {
+        const A = [];
+        for (let i = 0; i < 4; i++) {
+            const { x: sx, y: sy } = src[i];
+            const { x: dx, y: dy } = dst[i];
+            A.push([sx, sy, 1, 0, 0, 0, -dx * sx, -dx * sy, -dx]);
+            A.push([0, 0, 0, sx, sy, 1, -dy * sx, -dy * sy, -dy]);
+        }
+        const b = [];
+        for (let i = 0; i < 4; i++) {
+            b.push(dst[i].x);
+            b.push(dst[i].y);
+        }
+        const A_inv = [];
+        for(let i=0; i<8; i++) {
+            A_inv.push([]);
+            for(let j=0; j<8; j++) {
+                const {x:sx, y:sy} = src[Math.floor(i/2)];
+                if (i % 2 === 0) {
+                    A_inv[i][0] = sx;
+                    A_inv[i][1] = sy;
+                    A_inv[i][2] = 1;
+                    A_inv[i][3] = 0;
+                    A_inv[i][4] = 0;
+                    A_inv[i][5] = 0;
+                    A_inv[i][6] = -dst[Math.floor(i/2)].x * sx;
+                    A_inv[i][7] = -dst[Math.floor(i/2)].x * sy;
+                } else {
+                    A_inv[i][0] = 0;
+                    A_inv[i][1] = 0;
+                    A_inv[i][2] = 0;
+                    A_inv[i][3] = sx;
+                    A_inv[i][4] = sy;
+                    A_inv[i][5] = 1;
+                    A_inv[i][6] = -dy * sx;
+                    A_inv[i][7] = -dy * sy;
+                }
+            }
+        }
+        const h = gaussianElimination(A_inv, b);
+        if (!h) throw new Error("Matrix is singular.");
+        return [...h, 1];
+    }
+    function gaussianElimination(A, b) {
+        const n = A.length;
+        for (let i = 0; i < n; i++) {
+            let maxRow = i;
+            for (let k = i + 1; k < n; k++) {
+                if (Math.abs(A[k][i]) > Math.abs(A[maxRow][i])) {
+                    maxRow = k;
+                }
+            }
+            [A[i], A[maxRow]] = [A[maxRow], A[i]];
+            [b[i], b[maxRow]] = [b[maxRow], b[i]];
+            if (Math.abs(A[i][i]) < 1e-10) return null;
+            for (let k = i + 1; k < n; k++) {
+                A[i][k] /= A[i][i];
+            }
+            b[i] /= A[i][i];
+            A[i][i] = 1;
+            for (let k = 0; k < n; k++) {
+                if (k !== i) {
+                    const factor = A[k][i];
+                    for (let j = i; j < n; j++) {
+                        A[k][j] -= factor * A[i][j];
+                    }
+                    b[k] -= factor * b[i];
+                }
+            }
+        }
+        return b;
+    }
 
     // --- *** ADDED *** Shot Analysis Functions ---
 
