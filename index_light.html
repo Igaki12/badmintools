@@ -1204,13 +1204,7 @@ ${shotTimes.map((time, i) => `  ショット${i + 1}: ${time.toFixed(2)}秒`).jo
         ];
     }
 
-    function applyHomography(point, matrix) {
-        const d = matrix[6] * point.x + matrix[7] * point.y + 1;
-        return {
-            x: (matrix[0] * point.x + matrix[1] * point.y + matrix[2]) / d,
-            y: (matrix[3] * point.x + matrix[4] * point.y + matrix[5]) / d
-        };
-    }
+
 </script>
 
 </body>
