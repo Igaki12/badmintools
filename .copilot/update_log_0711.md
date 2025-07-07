@@ -124,6 +124,7 @@
 
 **変更ファイル:**
 - `/Users/embryo03/Documents/GitHub/badmintools/index.html`
+<<<<<<< HEAD
 
 ### 2. 重量版・軽量版への同様の改善適用
 
@@ -139,3 +140,5 @@
 **変更ファイル:**
 - `/Users/embryo03/Documents/GitHub/badmintools/index_heavy.html`
 - `/Users/embryo03/Documents/GitHub/badmintools/index_light.html`
+=======
+>>>>>>> parent of 17b0751 (Ver6.2 - データのエクスポートをとぐるリスト形式に)
