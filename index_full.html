@@ -520,13 +520,13 @@
     
     <div class="container mx-auto glass-card p-3 sm:p-6 w-full max-w-full">
         <header class="text-center mb-8">
-            <h1 class="text-4xl font-bold theme-text-accent">バドミントン動作分析（軽量版）</h1>
+            <h1 class="text-4xl font-bold theme-text-accent">バドミントン動作分析（標準版）</h1>
             <p class="theme-text-secondary mt-1">動画から選手の動きを捉え、軌跡とヒートマップで可視化します。</p>
             
             <!-- モデル切り替えボタン -->
             <div class="flex justify-center gap-2 mt-4">
-                <button class="glass-button bg-orange-500 text-white font-semibold" disabled>軽量版</button>
-                <a href="index_full.html" class="glass-button">標準版</a>
+                <a href="index.html" class="glass-button">軽量版</a>
+                <button class="glass-button bg-orange-500 text-white font-semibold" disabled>標準版</button>
                 <a href="index_heavy.html" class="glass-button">重量版</a>
             </div>
         </header>
@@ -764,8 +764,8 @@
                 baseOptions: {
                     // modelAssetPath: "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task",
                     // delegate: "GPU"
-                    // api/pose_landmarker_lite.task からローカルでダウンロードしたモデルを使用
-                    modelAssetPath: "api/pose_landmarker_lite.task",
+                    // api/pose_landmarker_full.task からローカルでダウンロードしたモデルを使用
+                    modelAssetPath: "api/pose_landmarker_full.task",
                     delegate: "GPU",
                 },
                 runningMode: runningMode,
