@@ -113,3 +113,30 @@
 
 **変更ファイル:**
 - `/Users/embryo03/Documents/GitHub/badmintools/index.html`
+
+
+さらに、標準版で動作するモデルをfull.task → lite.taskに。
+重量版で動作するモデルをheavy.task → full.taskに変更
+ブラウザで開かれる標準ページを標準版に変更
+それぞれのモデルへのリンクを変更
+
+### 3. コート補正（トリミング）機能のスマホ・タブレット対応
+
+**実施内容:**
+- コート四隅トリミング（cropOverlayCanvas）の操作について、スマートフォンやタブレットでもPCと同様に直感的なドラッグ操作ができるよう、タッチイベント（touchstart, touchmove, touchend, touchcancel）に対応。
+
+**具体的な変更:**
+- cropOverlayCanvasに以下のイベントリスナーを追加：
+  - touchstart：タッチ開始時にハンドルの当たり判定とドラッグ開始判定
+  - touchmove：ドラッグ中のハンドル移動
+  - touchend/touchcancel：ドラッグ終了
+- タッチ座標取得用のgetTouchCoords関数を追加し、clientX/clientYの代わりにtouches[0].clientX等を使用
+- e.preventDefault()と{ passive: false }で画面スクロール等の誤動作を防止
+- 既存のCROP_HANDLE_RADIUS（45）を活かし、タッチでもハンドルを掴みやすい設計
+
+**効果:**
+- スマホ・タブレットでもPCと同じ感覚でコート四隅の調整が可能
+- 小さな画面でも誤タッチを防ぎ、直感的な操作性を実現
+
+**変更ファイル:**
+- `/Users/embryo03/Documents/GitHub/badmintools/index.html`
