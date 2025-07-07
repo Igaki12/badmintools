@@ -525,8 +525,8 @@
             
             <!-- モデル切り替えボタン -->
             <div class="flex justify-center gap-2 mt-4">
-                <a href="index.html" class="glass-button">軽量版</a>
-                <a href="index_full.html" class="glass-button">標準版</a>
+                <a href="index_light.html" class="glass-button">軽量版</a>
+                <a href="index.html" class="glass-button">標準版</a>
                 <button class="glass-button bg-orange-500 text-white font-semibold" disabled>重量版</button>
             </div>
         </header>
@@ -764,8 +764,8 @@
                 baseOptions: {
                     // modelAssetPath: "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/1/pose_landmarker_lite.task",
                     // delegate: "GPU"
-                    // api/pose_landmarker_heavy.task からローカルでダウンロードしたモデルを使用
-                    modelAssetPath: "api/pose_landmarker_heavy.task",
+                    // api/pose_landmarker_heavy.task からローカルでダウンロードしたモデルを使用 → fullモデルを使用
+                    modelAssetPath: "api/pose_landmarker_full.task",
                     delegate: "GPU",
                 },
                 runningMode: runningMode,
