@@ -612,12 +612,20 @@
             
             <!-- エクスポート機能 -->
             <div class="mb-4 p-4 glass-card">
-                <h3 class="text-lg font-semibold mb-2 theme-text-accent">データエクスポート</h3>
-                <div class="flex flex-wrap gap-2">
-                    <button id="exportJSONButton" class="glass-button">JSON形式でエクスポート</button>
-                    <button id="exportCSVButton" class="glass-button">CSV形式でエクスポート</button>
-                    <button id="exportImageButton" class="glass-button">画像をエクスポート</button>
-                    <button id="generateReportButton" class="glass-button">レポート生成</button>
+                <div class="flex items-center justify-between">
+                    <h3 class="text-lg font-semibold theme-text-accent">データエクスポート</h3>
+                    <button id="exportToggleButton" class="glass-button md:hidden">
+                        <span id="exportToggleText">表示</span>
+                        <span id="exportToggleIcon" class="ml-1">▼</span>
+                    </button>
+                </div>
+                <div id="exportButtonsContainer" class="mt-2 md:block hidden">
+                    <div class="flex flex-wrap gap-2">
+                        <button id="exportJSONButton" class="glass-button">JSON形式でエクスポート</button>
+                        <button id="exportCSVButton" class="glass-button">CSV形式でエクスポート</button>
+                        <button id="exportImageButton" class="glass-button">画像をエクスポート</button>
+                        <button id="generateReportButton" class="glass-button">レポート生成</button>
+                    </div>
                 </div>
             </div>
 
@@ -706,6 +714,10 @@
     const exportCSVButton = document.getElementById('exportCSVButton');
     const exportImageButton = document.getElementById('exportImageButton');
     const generateReportButton = document.getElementById('generateReportButton');
+    const exportToggleButton = document.getElementById('exportToggleButton');
+    const exportToggleText = document.getElementById('exportToggleText');
+    const exportToggleIcon = document.getElementById('exportToggleIcon');
+    const exportButtonsContainer = document.getElementById('exportButtonsContainer');
 
     // Canvas Contexts
     let ctxPose = poseCanvas.getContext('2d');
@@ -1516,6 +1528,20 @@ ${shotTimes.map((time, i) => `  ショット${i + 1}: ${time.toFixed(2)}秒`).jo
     exportCSVButton.addEventListener('click', exportToCSV);
     exportImageButton.addEventListener('click', exportImages);
     generateReportButton.addEventListener('click', generateReport);
+
+    // *** ADDED *** Export toggle functionality for mobile
+    exportToggleButton.addEventListener('click', () => {
+        const isHidden = exportButtonsContainer.classList.contains('hidden');
+        if (isHidden) {
+            exportButtonsContainer.classList.remove('hidden');
+            exportToggleText.textContent = '非表示';
+            exportToggleIcon.textContent = '▲';
+        } else {
+            exportButtonsContainer.classList.add('hidden');
+            exportToggleText.textContent = '表示';
+            exportToggleIcon.textContent = '▼';
+        }
+    });
 
     // *** ADDED *** Help Modal Functions
     const helpModal = document.getElementById('helpModal');
