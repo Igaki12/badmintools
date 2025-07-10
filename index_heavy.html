@@ -1391,6 +1391,13 @@
             button.onclick = () => {
                 video.currentTime = time;
                 drawAnalysis(time);
+                //　時間軸スライダーを更新
+                timeSlider.value = time;
+                sliderCurrentTime.textContent = `${time.toFixed(1)}s`;
+                sliderMaxTime.textContent = `${video.duration.toFixed(1)}s`;
+                sliderMinTime.textContent = "0.0s";
+                // スクロールしてボタンを表示
+                button.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             };
             shotButtonsContainer.appendChild(button);
         });
