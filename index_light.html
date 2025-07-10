@@ -1,4 +1,3 @@
-@ -0,0 +1,1014 @@
 <!DOCTYPE html>
 
 <html lang="ja">
@@ -694,14 +693,30 @@
          const ctx = ctxCropOverlay; ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); ctx.beginPath(); ctx.moveTo(cropPoints[0].x, cropPoints[0].y); 
          for (let i = 1; i < cropPoints.length; i++) { ctx.lineTo(cropPoints[i].x, cropPoints[i].y); } ctx.closePath(); ctx.fillStyle = "rgba(59, 130, 246, 0.2)"; ctx.fill(); ctx.strokeStyle = "rgba(37, 99, 235, 1)"; ctx.lineWidth = 4; ctx.stroke(); cropPoints.forEach((p, i) => { ctx.beginPath(); ctx.arc(p.x, p.y, CROP_HANDLE_RADIUS, 0, 2 * Math.PI); ctx.fillStyle = (i === draggedPointIndex) ? "#dc2626" : "#2563eb"; ctx.fill(); });
         }
+            // mouseup,mouseoutイベントを、touchstart, touchmove, touchendイベントにも対応させる
     cropOverlayCanvas.addEventListener('mousedown', (e) => {
          if (!isCroppingMode) return; const rect = cropOverlayCanvas.getBoundingClientRect(); const mouseX = (e.clientX - rect.left) * (cropOverlayCanvas.width / rect.width); const mouseY = (e.clientY - rect.top) * (cropOverlayCanvas.height / rect.height); draggedPointIndex = cropPoints.findIndex(p => Math.sqrt((p.x - mouseX)**2 + (p.y - mouseY)**2) < CROP_HANDLE_RADIUS); if (draggedPointIndex !== -1) { isDragging = true; cropOverlayCanvas.style.cursor = 'grabbing'; } 
         });
     cropOverlayCanvas.addEventListener('mousemove', (e) => {
          if (!isCroppingMode) return; const rect = cropOverlayCanvas.getBoundingClientRect(); const mouseX = (e.clientX - rect.left) * (cropOverlayCanvas.width / rect.width); const mouseY = (e.clientY - rect.top) * (cropOverlayCanvas.height / rect.height); if (isDragging && draggedPointIndex !== -1) { cropPoints[draggedPointIndex] = { x: mouseX, y: mouseY }; drawCropOverlay(); } else { const onHandle = cropPoints.some(p => Math.sqrt((p.x - mouseX)**2 + (p.y - mouseY)**2) < CROP_HANDLE_RADIUS); cropOverlayCanvas.style.cursor = onHandle ? 'grab' : 'default'; } });
+    // 追加部分↓
+    cropOverlayCanvas.addEventListener('touchstart', (e) => {
+         if (!isCroppingMode) return; e.preventDefault(); const rect = cropOverlayCanvas.getBoundingClientRect(); const touch = e.touches[0]; const touchX = (touch.clientX - rect.left) * (cropOverlayCanvas.width / rect.width); const touchY = (touch.clientY - rect.top) * (cropOverlayCanvas.height / rect.height); draggedPointIndex = cropPoints.findIndex(p => Math.sqrt((p.x - touchX)**2 + (p.y - touchY)**2) < CROP_HANDLE_RADIUS); if (draggedPointIndex !== -1) { isDragging = true; } 
+        });
+    cropOverlayCanvas.addEventListener('touchmove', (e) => {
+         if (!isCroppingMode) return; e.preventDefault(); const rect = cropOverlayCanvas.getBoundingClientRect(); const touch = e.touches[0]; const touchX = (touch.clientX - rect.left) * (cropOverlayCanvas.width / rect.width); const touchY = (touch.clientY - rect.top) * (cropOverlayCanvas.height / rect.height); if (isDragging && draggedPointIndex !== -1) { cropPoints[draggedPointIndex] = { x: touchX, y: touchY }; drawCropOverlay(); } });
+    cropOverlayCanvas.addEventListener('touchend', (e) => {
+         if (!isCroppingMode) return; e.preventDefault(); if (isDragging) { isDragging = false; draggedPointIndex = -1; } 
+        });
+        // 追加部分↑
     const stopDrag = () => { if (isDragging) { isDragging = false; draggedPointIndex = -1; cropOverlayCanvas.style.cursor = 'grab'; } };
+
     cropOverlayCanvas.addEventListener('mouseup', stopDrag);
     cropOverlayCanvas.addEventListener('mouseout', stopDrag);
+    // 追加部分↓
+    cropOverlayCanvas.addEventListener('touchcancel', stopDrag);
+    cropOverlayCanvas.addEventListener('touchleave', stopDrag);
+    // 追加部分↑
     applyCorrectionButton.addEventListener('click', () => {
         const srcPoints = cropPoints;
         const dstPoints = [{ x: 0, y: 0 }, { x: trajectoryCanvas.width, y: 0 }, { x: trajectoryCanvas.width, y: trajectoryCanvas.height }, { x: 0, y: trajectoryCanvas.height },];

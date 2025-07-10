@@ -122,3 +122,6 @@
 
 **変更ファイル:**
 - `/Users/embryo03/Documents/GitHub/badmintools/index.html`
+
+
+### さらにindex_light.htmlにもスマホ対応を実施
