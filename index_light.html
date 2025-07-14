@@ -95,6 +95,13 @@
 </head>
 
 <body class="p-4 min-h-screen">
+    <!-- ログアウトボタン -->
+    <div class="fixed top-4 right-4 z-10">
+        <a href="index.html" class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg shadow-lg transition duration-200 text-sm">
+            ログアウト
+        </a>
+    </div>
+    
     <div class="container mx-auto simple-card p-4">
         <header class="text-center mb-6">
             <h1 class="text-3xl font-bold text-accent">バドミントン動作分析（軽量版）</h1>
@@ -103,7 +110,7 @@
             <!-- モデル切り替えボタン -->
             <div class="flex justify-center gap-2 mt-4">
                 <button class="simple-button bg-orange-500" disabled>軽量版</button>
-                <a href="index.html" class="simple-button">標準版</a>
+                <a href="index_medium.html" class="simple-button">標準版</a>
                 <a href="index_heavy.html" class="simple-button">重量版</a>
             </div>
         </header>

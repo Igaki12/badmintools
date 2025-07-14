@@ -141,11 +141,10 @@
                 // Mock success/failure
                 if (email === 'user@badmintools.com' && password === 'password123') {
                     showToast('ログインに成功しました！', true);
-                    // On success, redirect to the main application
-                    setTimeout(() => { window.location.href = 'index_medium.html'; }, 1000);
+                    // On success, you would typically redirect the user:
+                    // setTimeout(() => { window.location.href = '/dashboard'; }, 1500);
                 } else {
                     showToast('EmailまたはPasswordが正しくありません。', false);
-                    setTimeout(() => { window.location.href = 'index_medium.html'; }, 1000);
                 }
             });
 
