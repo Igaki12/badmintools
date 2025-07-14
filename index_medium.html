@@ -522,6 +522,31 @@
             }
         }
 
+    /* サンプル動画ボタンの状態管理 */
+    #sampleVideoButton.loading {
+        background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+        color: white;
+        border-color: rgba(249, 115, 22, 0.3);
+        pointer-events: none;
+    }
+
+    #sampleVideoButton.success {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        border-color: rgba(16, 185, 129, 0.3);
+    }
+
+    /* ローディングスピナー */
+    .loading-spinner-btn {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 1s ease-in-out infinite;
+    }
+
     /* スライダーのつまみのスタイル */
     input[type="range"]::-webkit-slider-thumb {
         -webkit-appearance: none;
@@ -862,7 +887,18 @@
 
     // サンプル動画ボタンのイベントリスナー
     document.getElementById('sampleVideoButton').addEventListener('click', async () => {
+        const sampleBtn = document.getElementById('sampleVideoButton');
+        const originalContent = sampleBtn.innerHTML;
+        
         try {
+            // ローディング状態に変更
+            sampleBtn.disabled = true;
+            sampleBtn.classList.add('loading');
+            sampleBtn.innerHTML = `
+                <div class="loading-spinner-btn sm:mr-2 mr-0 inline-block"></div>
+                <span class="hidden sm:inline">読み込み中...</span>
+            `;
+            
             const response = await fetch('sample-files/video_mod.mp4');
             if (!response.ok) {
                 throw new Error('サンプル動画の読み込みに失敗しました');
@@ -875,12 +911,46 @@
             dt.items.add(file);
             fileInput.files = dt.files;
             
+            // 成功状態に変更
+            sampleBtn.classList.remove('loading');
+            sampleBtn.classList.add('success');
+            sampleBtn.innerHTML = `
+                <svg class="w-4 h-4 sm:mr-2 mr-0 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <span class="hidden sm:inline">読み込み完了</span>
+            `;
+            
             // Trigger the change event
             const event = new Event('change', { bubbles: true });
             fileInput.dispatchEvent(event);
+            
+            // 2秒後に元の状態に戻す
+            setTimeout(() => {
+                sampleBtn.classList.remove('success');
+                sampleBtn.innerHTML = originalContent;
+                sampleBtn.disabled = false;
+            }, 2000);
+            
         } catch (error) {
             console.error('サンプル動画の読み込みエラー:', error);
+            
+            // エラー状態に変更
+            sampleBtn.classList.remove('loading');
+            sampleBtn.innerHTML = `
+                <svg class="w-4 h-4 sm:mr-2 mr-0 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+                <span class="hidden sm:inline">エラー</span>
+            `;
+            
             alert('サンプル動画の読み込みに失敗しました。sample-files/video_mod.mp4が存在することを確認してください。');
+            
+            // 3秒後に元の状態に戻す
+            setTimeout(() => {
+                sampleBtn.innerHTML = originalContent;
+                sampleBtn.disabled = false;
+            }, 3000);
         }
     });
 
