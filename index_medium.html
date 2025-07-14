@@ -268,6 +268,58 @@
             box-shadow: var(--glass-shadow);
         }
         
+        /* ログアウトボタン */
+        .logout-selector {
+            background: var(--glass-bg);
+            backdrop-filter: var(--backdrop-blur);
+            -webkit-backdrop-filter: var(--backdrop-blur);
+            padding: 8px;
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+            box-shadow: var(--glass-shadow);
+        }
+        
+        .logout-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+        }
+        
+        .logout-btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: all 0.3s ease;
+        }
+        
+        .logout-btn:hover::after {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .logout-btn:hover {
+            transform: scale(1.05);
+            border-color: rgba(255, 255, 255, 0.6);
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
+        }
+        
         .theme-btn {
             width: 36px;
             height: 36px;
@@ -519,10 +571,14 @@
     </div>
     
     <!-- ログアウトボタン -->
-    <div class="fixed top-4 left-4 z-50">
-        <a href="index.html" class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg shadow-lg transition duration-200 text-sm">
-            ログアウト
-        </a>
+    <div class="fixed top-6 left-6 z-50">
+        <div class="logout-selector">
+            <a href="index.html" class="logout-btn" title="ログアウト">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+            </a>
+        </div>
     </div>
     
     <div class="container mx-auto glass-card p-3 sm:p-6 w-full max-w-full">
