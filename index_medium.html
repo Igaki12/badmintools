@@ -599,12 +599,20 @@
         <h2 class="text-2xl font-semibold mb-3 theme-text-accent">1. 動画の準備 
             <button id="helpButton" class="ml-2 text-sm glass-button px-2 py-1">?</button>
         </h2>
-        <input type="file" id="fileInput" accept="video/*" class="block w-full text-sm text-slate-500
-          file:mr-4 file:py-2 file:px-4
-          file:rounded-lg file:border-0
-          file:text-sm file:font-semibold
-          file:bg-orange-100 file:text-orange-700
-          hover:file:bg-orange-200 disabled:opacity-50 transition-colors" disabled>
+        <div class="flex gap-3 items-end">
+            <input type="file" id="fileInput" accept="video/*" class="flex-1 text-sm text-slate-500
+              file:mr-4 file:py-2 file:px-4
+              file:rounded-lg file:border-0
+              file:text-sm file:font-semibold
+              file:bg-orange-100 file:text-orange-700
+              hover:file:bg-orange-200 disabled:opacity-50 transition-colors" disabled>
+            <button id="sampleVideoButton" class="glass-button px-4 py-2 text-sm font-medium transition-all duration-200 hover:scale-105" disabled>
+                <svg class="w-4 h-4 mr-2 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                </svg>
+                サンプル動画を使う
+            </button>
+        </div>
         <!-- プログレスバー -->
         <div id="progressContainer" class="hidden mb-4">
             <div class="flex justify-between text-sm theme-text-secondary mb-1">
@@ -837,6 +845,7 @@
             console.log("PoseLandmarker initialized");
             loadingTxt.textContent = "モデル読み込み完了。動画を選択してください。";
             fileInput.disabled = false;
+            document.getElementById('sampleVideoButton').disabled = false;
         } catch (err) {
             console.error("Error initializing PoseLandmarker:", err);
             loadingTxt.textContent = "モデル読み込みに失敗しました。ページをリロードしてください。";
@@ -844,6 +853,30 @@
     }
 
     initPoseLandmarker();
+
+    // サンプル動画ボタンのイベントリスナー
+    document.getElementById('sampleVideoButton').addEventListener('click', async () => {
+        try {
+            const response = await fetch('sample-files/video_mod.mp4');
+            if (!response.ok) {
+                throw new Error('サンプル動画の読み込みに失敗しました');
+            }
+            const blob = await response.blob();
+            const file = new File([blob], 'video_mod.mp4', { type: 'video/mp4' });
+            
+            // Create a new FileList-like object
+            const dt = new DataTransfer();
+            dt.items.add(file);
+            fileInput.files = dt.files;
+            
+            // Trigger the change event
+            const event = new Event('change', { bubbles: true });
+            fileInput.dispatchEvent(event);
+        } catch (error) {
+            console.error('サンプル動画の読み込みエラー:', error);
+            alert('サンプル動画の読み込みに失敗しました。sample-files/video_mod.mp4が存在することを確認してください。');
+        }
+    });
 
     fileInput.addEventListener('change', (event) => {
         const file = event.target.files[0];
